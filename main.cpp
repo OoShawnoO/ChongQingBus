@@ -13,7 +13,8 @@
 typedef struct station_edge{
     int next_adj_station_id;
     int pre_adj_station_id;
-    int instance;
+    int next_instance;
+    int pre_instance;
     int line_id;
     station_edge* next;
 }Station_Edge;
@@ -37,8 +38,8 @@ typedef struct line{
 }Line;
 
 typedef struct {
-    Station *stations;
-    Line *lines;
+    Station stations[Total_stations];
+    Line lines[Total_lines];
 }Nets;
 
 Station* Create_Station(char* name,int station_id,station_edge* first){
@@ -57,6 +58,30 @@ Line* Create_Line(char* name,int line_id,Node* head){
     return line;
 }
 
+void Add_Edge(station_edge* head,Node *n,int line_id){
+    auto* stationEdge = (station_edge*)malloc(sizeof(station_edge));
+    station_edge *p;
+    p = head;
+    if(n->pre== nullptr){
+        stationEdge->pre_adj_station_id = -1;
+    }
+    else{
+        stationEdge->pre_adj_station_id = n->pre->station_id;
+    }
+    if(n->next==nullptr){
+        stationEdge->next_adj_station_id = -1;
+    }
+    else{
+        stationEdge->next_adj_station_id = n->next->station_id;
+    }
+    stationEdge->line_id = line_id;
+    stationEdge->next_instance = 0;
+    stationEdge->pre_instance = 0;
+    stationEdge->next = nullptr;
+    while(p->next!=nullptr){p=p->next;}
+    p->next = stationEdge;
+}
+
 Nets Initialize_Nets(){
     Nets *nets = (Nets *)malloc(sizeof(Nets));
     Station stations[Total_stations];
@@ -72,7 +97,14 @@ Nets Initialize_Nets(){
     for(;stations_num<Total_stations;stations_num++){
         char str[1024]={'\0'};
         fscanf(fp_station,"%s",str);
-        Station *station = Create_Station(str,stations_num,nullptr);
+        auto* head = (station_edge*)malloc(sizeof(station_edge));
+        head->next = nullptr;
+        head->next_adj_station_id = -1;
+        head->next_instance = 0;
+        head->line_id = -1;
+        head->pre_adj_station_id = -1;
+        head->pre_instance = 0;
+        Station *station = Create_Station(str,stations_num,head);
         stations[stations_num] = *station;
     }
 
@@ -104,31 +136,56 @@ Nets Initialize_Nets(){
         }
     }
 
-    nets->lines = lines;
-    nets->stations = stations;
+
+    for(int i=0;i<Total_lines;i++) {
+        Node *n = lines[i].head;
+        while(n->next!=nullptr){
+            for(int j=0;j<Total_stations;j++){
+                if(stations[j].station_id == n->station_id){
+                    Add_Edge(stations[j].first,n,i);
+                }
+            }
+            n = n->next;
+        }
+    }
+
+    for(int i=0;i<Total_lines;i++){
+        nets->lines[i] = lines[i];
+    }
+    for(int j=0;j<Total_stations;j++){
+        nets->stations[j] = stations[j];
+    }
     return *nets;
 }
 
 void Show_Lines(Nets nets){
-    for(int i=0;i<Total_lines;i++){
-       Node* n = nets.lines[i].head;
-        printf("%s ",nets.lines[i].name);
-        while(n->next!=nullptr){
-            printf("%s->",nets.stations[n->station_id].name);
-            n = n->next;
-        }
-        printf("\n");
+//    for(int i=0;i<Total_lines;i++){
+//       Node* n = nets.lines[i].head;
+//        printf("%s ",nets.lines[i].name);
+//        while(n->next!=nullptr){
+//            printf("%s->",nets.stations[n->station_id].name);
+//            n = n->next;
+//        }
+//        printf("\n");
+//
+//        while(n->pre!=nullptr){
+//            printf("%s=>",nets.stations[n->pre->station_id].name);
+//            n = n->pre;
+//        }
+//        printf("\n");
+//    }
 
-        while(n->pre!=nullptr){
-            printf("%s=>",nets.stations[n->pre->station_id].name);
-            n = n->pre;
+    for(int j=0;j<Total_stations;j++){
+        printf("%d %s ",j,nets.stations[j].name);
+//        printf("%s",nets.stations[nets.stations[j].first->next->next_adj_station_id].name);
+        Station_Edge* p = nets.stations[j].first->next;
+        while(p!= nullptr){
+            printf("(%s %s)",nets.stations[p->next_adj_station_id].name,nets.lines[p->line_id].name);
+            p = p->next;
         }
         printf("\n");
     }
 
-//    for(int j=0;j<Total_stations;j++){
-//        printf("%d %s\n",j,nets.stations[j].name);
-//    }
 }
 
 int main() {
