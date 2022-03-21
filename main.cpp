@@ -1,8 +1,8 @@
 #include <iostream>
 #include <cstring>
 
-#define Total_lines 30
-#define Total_stations 150
+#define Total_lines 69
+#define Total_stations 577
 
 
 /*
@@ -90,7 +90,7 @@ Nets Initialize_Nets(){
 
     FILE *fp_station = fopen("D://C_learn/DSCD/stations.txt","r");
     FILE *fp_line = fopen("D://C_learn/DSCD/lines.txt","r");
-    FILE *fp_station_line = fopen("D://C_learn/DSCD/station_lines.txt","r");
+//    FILE *fp_station_line = fopen("D://C_learn/DSCD/station_lines.txt","r");
 
 
     /* ³õÊ¼»¯Õ¾µã */
@@ -180,7 +180,7 @@ void Show_Lines(Nets nets){
 //        printf("%s",nets.stations[nets.stations[j].first->next->next_adj_station_id].name);
         Station_Edge* p = nets.stations[j].first->next;
         while(p!= nullptr){
-            printf("(%s %s)",nets.stations[p->next_adj_station_id].name,nets.lines[p->line_id].name);
+            printf("(%s %s)",nets.stations[p->pre_adj_station_id].name,nets.lines[p->line_id].name);
             p = p->next;
         }
         printf("\n");
