@@ -1,8 +1,11 @@
 #include <iostream>
 #include <cstring>
 
-#define Total_lines 69
-#define Total_stations 577
+//#define Total_lines 527
+//#define Total_stations 3431
+const int Total_lines = 528;
+const int Total_stations =3431;
+
 
 
 /*
@@ -33,7 +36,7 @@ typedef struct node{
 
 typedef struct line{
     int line_id;
-    char name[100];
+    char name[1024];
     node* head;
 }Line;
 
@@ -49,6 +52,10 @@ Station* Create_Station(char* name,int station_id,station_edge* first){
     station->first = first;
     return station;
 }
+
+
+Station stations[Total_stations];
+Line lines[Total_lines];
 
 Line* Create_Line(char* name,int line_id,Node* head){
     auto *line = (Line*)malloc(sizeof(Line));
@@ -84,8 +91,7 @@ void Add_Edge(station_edge* head,Node *n,int line_id){
 
 Nets Initialize_Nets(){
     Nets *nets = (Nets *)malloc(sizeof(Nets));
-    Station stations[Total_stations];
-    Line lines[Total_lines];
+
     int stations_num=0,lines_num=0;
 
     FILE *fp_station = fopen("D://C_learn/DSCD/stations.txt","r");
