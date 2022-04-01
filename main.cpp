@@ -1,8 +1,7 @@
 #include <iostream>
 #include <cstring>
 
-//#define Total_lines 527
-//#define Total_stations 3431
+
 const int Total_lines = 528;
 const int Total_stations =3431;
 const int  MAX_DISTANCE=9999999;
@@ -12,6 +11,14 @@ const int  MAX_DISTANCE=9999999;
  * 将车站作为节点v,公交线路则为关系e.
  * 使用领接表这种数据结构
  * */
+
+enum Mode{
+    Most_save = 1, /*最经济模式  （考虑很多车的全程都是2元 单线乘坐超过10站 每100m+0.1元） */
+    Most_fast,     /*最快速模式*/
+    Least_change,   /*最少换乘模式*/
+    Wanna_Pass,     /*期望经过模式*/
+    Synthesize,     /*综合模式*/
+};
 
 typedef struct station_edge{
     int next_adj_station_id;
@@ -54,7 +61,6 @@ Station* Create_Station(char* name,int station_id,station_edge* first){
     station->first = first;
     return station;
 }
-
 
 static Station stations[Total_stations];
 static Line lines[Total_lines];
@@ -166,9 +172,9 @@ Nets Initialize_Nets(){
     for(int i=0;i<Total_lines;i++) {
         Node *n = lines[i].head;
         while(n->next!=nullptr){
-            for(int j=0;j<Total_stations;j++){
-                if(stations[j].station_id == n->station_id){
-                    Add_Edge(stations[j].first,n,i);
+            for(auto & station : stations){
+                if(station.station_id == n->station_id){
+                    Add_Edge(station.first,n,i);
                 }
             }
             n = n->next;
@@ -220,25 +226,29 @@ void Show_Lines(Nets nets){
 
 }
 
+void Go(int station_1,int station_2,Mode mode,...){
+
+}
+
 /*
- * Nets -> stations[] / lines[]
+ * Nets -> stations[] / lines[] {交通网 -> 站数组 / 线数组
  *
- * Station -> station_id
+ * Station -> station_id        {车站 -> 车站id / 车站名称 / 车站领接表}
  *          / name
  *          / Station_Edge
  *
- * Station_Edge -> next_adj_station_id
+ * Station_Edge -> next_adj_station_id  {车站领接表 -> 下一站车站id / 上一站车站id / 下一站距离 / 上一站距离 / 所在线路id / 下一个车站领接关系}
  *              / pre_adj_station_id
  *              / next_instance
  *              / pre_instance
  *              / line_id
  *              / station_edge* next
  *
- * Line -> line_id
+ * Line -> line_id {线路 -> 线路id / 线路名称 / 线路首站头结点}
  *      / name
  *      / Node* head
  *
- * Node -> station_id
+ * Node -> station_id   {车站节点 -> 车站id / 下一站距离 / 上一站距离 / 上一站节点 / 下一站节点}
  *  / next_distance
  *  / pre_distance
  *  / Node* next
@@ -246,8 +256,10 @@ void Show_Lines(Nets nets){
  *
  * */
 
+
 int main() {
     system("chcp 65001");
     Nets nets = Initialize_Nets();
     Show_Lines(nets);
+    Go(1,2,Most_fast);
 }
