@@ -1,6 +1,9 @@
 #include <iostream>
 #include <cstring>
 
+#define _USED 1
+#define _UNUSED 0
+#define _DROPED -1
 
 const int Total_lines = 528;
 const int Total_stations =3431;
@@ -20,11 +23,22 @@ enum Mode{
     Synthesize,     /*综合模式*/
 };
 
+enum Algorithm{     /*采用的算法*/
+    Dijkstra = 1,   /*Dijkstra算法*/
+    DFS,            /*深度优先*/
+    BFS,            /*广度优先*/
+};
+
+enum Exit{
+    Not_Found = 1,
+};
+
 typedef struct station_edge{
     int next_adj_station_id;
     int pre_adj_station_id;
     int next_distance;
     int pre_distance;
+    int current_station_id;
     int line_id;
     station_edge* next;
 }Station_Edge;
@@ -73,7 +87,7 @@ Line* Create_Line(char* name,int line_id,Node* head){
     return line;
 }
 
-void Add_Edge(station_edge* head,Node *n,int line_id){
+void Add_Edge(station_edge* head,Node *n,int line_id,int station_id){
     auto* stationEdge = (station_edge*)malloc(sizeof(station_edge));
     station_edge *p;
     p = head;
@@ -93,6 +107,7 @@ void Add_Edge(station_edge* head,Node *n,int line_id){
         stationEdge->next_adj_station_id = n->next->station_id;
         stationEdge->next_distance = n->next_distance;
     }
+    stationEdge->current_station_id = station_id;
     stationEdge->line_id = line_id;
     stationEdge->next = nullptr;
     while(p->next!=nullptr){p=p->next;}
@@ -174,7 +189,7 @@ Nets Initialize_Nets(){
         while(n->next!=nullptr){
             for(auto & station : stations){
                 if(station.station_id == n->station_id){
-                    Add_Edge(station.first,n,i);
+                    Add_Edge(station.first,n,i,station.station_id);
                 }
             }
             n = n->next;
@@ -194,40 +209,130 @@ Nets Initialize_Nets(){
 }
 
 void Show_Lines(Nets nets){
-    for(int i=0;i<Total_lines;i++){
-       Node* n = nets.lines[i].head;
-        printf("%s ",nets.lines[i].name);
-        while(n->next!=nullptr){
-            printf("%s->%d->",nets.stations[n->station_id].name,n->next_distance);
-            n = n->next;
-        }
-        printf("\n");
-        n = n->pre;
-        while(n!=nullptr){
-            printf("%s=>",nets.stations[n->station_id].name);
-            station_edge* q = nets.stations[n->station_id].first;
-            while(q->line_id!=i){q=q->next;}
-            printf("%d=>",q->pre_distance);
-            n = n->pre;
-        }
-        printf("\n");
-    }
-
-//    for(int j=0;j<Total_stations;j++){
-//        printf("%d %s ",j,nets.stations[j].name);
-////        printf("%s",nets.stations[nets.stations[j].first->next->next_adj_station_id].name);
-//        Station_Edge* p = nets.stations[j].first->next;
-//        while(p!= nullptr){
-//            printf("(%s %s)",nets.stations[p->pre_adj_station_id].name,nets.lines[p->line_id].name);
-//            p = p->next;
+//    for(int i=0;i<Total_lines;i++){
+//       Node* n = nets.lines[i].head;
+//        printf("%s ",nets.lines[i].name);
+//        while(n->next!=nullptr){
+//            printf("%s->%d->",nets.stations[n->station_id].name,n->next_distance);
+//            n = n->next;
+//        }
+//        printf("\n");
+//        n = n->pre;
+//        while(n!=nullptr){
+//            printf("%s=>",nets.stations[n->station_id].name);
+//            station_edge* q = nets.stations[n->station_id].first;
+//            while(q->line_id!=i){q=q->next;}
+//            printf("%d=>",q->pre_distance);
+//            n = n->pre;
 //        }
 //        printf("\n");
 //    }
 
+    for(int j=0;j<Total_stations;j++){
+        printf("%d %s ",j,nets.stations[j].name);
+//        printf("%s",nets.stations[nets.stations[j].first->next->next_adj_station_id].name);
+        Station_Edge* p = nets.stations[j].first->next;
+        while(p!= nullptr){
+            printf("(%s %s)",nets.stations[p->pre_adj_station_id].name,nets.lines[p->line_id].name);
+            p = p->next;
+        }
+        printf("\n");
+    }
+
 }
 
-void Go(int station_1,int station_2,Mode mode,...){
+void Dijkstra_(int* pass,int* distance,int* path,int* set,Nets nets,int sta1_id){
+    int smallest = MAX_DISTANCE,smallest_index = -1;
+    for(int x=0;x<Total_stations;x++){
+        if(distance[x]<smallest && x!=sta1_id && set[x]!=_DROPED){smallest=distance[x];smallest_index=x;}
+    }
+    station_edge *p = nets.stations[smallest_index].first->next;
+    while(p!= nullptr) {
+        int flag = 0;
+        if(p->next_adj_station_id!=-1){
+            if(distance[path[p->current_station_id]]+p->next_distance<distance[p->next_adj_station_id]){
+                distance[p->next_adj_station_id] = distance[path[p->current_station_id]]+p->next_distance;
+                path[p->next_adj_station_id] = p->current_station_id;
+                set[p->next_adj_station_id] = _USED;
+                pass[p->next_adj_station_id] = p->line_id;
+                flag =1;
+            }
+        }
+        if(p->pre_adj_station_id!=-1){
+            if(distance[path[p->current_station_id]]+p->pre_distance<distance[p->pre_adj_station_id]){
+                distance[p->pre_adj_station_id] = distance[path[p->current_station_id]]+p->pre_distance;
+                path[p->pre_adj_station_id] = p->current_station_id;
+                set[p->pre_adj_station_id] = _USED;
+                pass[p->pre_adj_station_id] = p->line_id;
+                flag =1;
+            }
+        }
+        if(flag != 1){
+            set[smallest_index] = _DROPED;
+        }
 
+        p = p->next;
+    }
+}
+
+void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
+    int sta1_id=-1,sta2_id=-1;
+    for(int id=0;id<Total_stations;id++){
+        if(strcmp(nets.stations[id].name,station_1)==0){sta1_id = id;}
+        if(strcmp(nets.stations[id].name,station_2)==0){sta2_id = id;}
+        if(sta1_id!=-1&&sta2_id!=-1){break;}
+    }
+    if(sta1_id==-1||sta2_id==-1){
+        exit(Not_Found);
+    }
+    else{
+        if(alg==Dijkstra){
+            int distance[Total_stations]; /*顶点到其余各顶点的最短路径长度*/
+            for(int & i : distance){i=MAX_DISTANCE;}
+            int path[Total_stations] = {-1}; /*最短路径的前一个顶点下标*/
+            for(int & i : path){i=-1;}
+            int set[Total_stations] = {_UNUSED}; /*顶点是否被并入最短路径*/
+            int pass[Total_stations];
+            for(int & pas : pass){pas=-1;}
+
+            distance[sta1_id] = 0;
+            set[sta1_id] = _USED;
+            path[sta1_id] = sta1_id;
+            station_edge *p = nets.stations[sta1_id].first->next;
+            while(p->next!=nullptr) {
+                if(p->next_distance<distance[p->next_adj_station_id]){
+                    distance[p->next_adj_station_id] = p->next_distance;
+                    path[p->next_adj_station_id] = p->current_station_id;
+                    set[p->next_adj_station_id] = _USED;
+                    pass[p->next_adj_station_id] = p->line_id;
+
+                }
+                if(p->pre_distance<distance[p->pre_adj_station_id]){
+                    distance[p->pre_adj_station_id] = p->pre_distance;
+                    path[p->pre_adj_station_id] = p->current_station_id;
+                    set[p->pre_adj_station_id] = _USED;
+                    pass[p->pre_adj_station_id] = p->line_id;
+
+                }
+                p = p->next;
+            }
+            while(distance[sta2_id]==MAX_DISTANCE){
+                Dijkstra_(pass,distance,path,set,nets,sta1_id);
+            }
+            int x = sta2_id;
+            while(x!=sta1_id){
+                printf("(%s)%s->",nets.lines[pass[x]].name,nets.stations[x].name);
+                x = path[x];
+            }
+            printf("%s distance:%d",nets.stations[sta1_id].name,distance[sta2_id]);
+        }
+        if(alg==DFS){
+
+        }
+        if(alg==BFS){
+
+        }
+    }
 }
 
 /*
@@ -260,6 +365,10 @@ void Go(int station_1,int station_2,Mode mode,...){
 int main() {
     system("chcp 65001");
     Nets nets = Initialize_Nets();
-    Show_Lines(nets);
-    Go(1,2,Most_fast);
+//    Show_Lines(nets);
+    char sta1[512] = {0};
+    char sta2[512] = {0};
+    printf("请输入出发站点 目标站点:");
+    scanf("%s %s",sta2,sta1);
+    Go(nets,sta1,sta2,Most_fast,Dijkstra);
 }
