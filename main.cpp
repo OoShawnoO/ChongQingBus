@@ -363,12 +363,14 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
 
 
 int main() {
-    system("chcp 65001");
+//    system("chcp 65001");
     Nets nets = Initialize_Nets();
 //    Show_Lines(nets);
     char sta1[512] = {0};
     char sta2[512] = {0};
-    printf("请输入出发站点 目标站点:");
+    char scanfTip[512] = "请输入出发站点 目标站点:";
+    printf("%s",scanfTip);
+    fflush(stdout);
     scanf("%s %s",sta2,sta1);
     Go(nets,sta1,sta2,Most_fast,Dijkstra);
 }
