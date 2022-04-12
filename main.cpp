@@ -11,22 +11,22 @@ const int  MAX_DISTANCE=9999999;
 
 
 /*
- * ½«³µÕ¾×÷Îª½Úµãv,¹«½»ÏßÂ·ÔòÎª¹ØÏµe.
- * Ê¹ÓÃÁì½Ó±íÕâÖÖÊı¾İ½á¹¹
+ * ï¿½ï¿½ï¿½ï¿½Õ¾ï¿½ï¿½Îªï¿½Úµï¿½v,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½Îªï¿½ï¿½Ïµe.
+ * Ê¹ï¿½ï¿½ï¿½ï¿½Ó±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ½á¹¹
  * */
 
 enum Mode{
-    Most_save = 1, /*×î¾­¼ÃÄ£Ê½  £¨¿¼ÂÇºÜ¶à³µµÄÈ«³Ì¶¼ÊÇ2Ôª µ¥Ïß³Ë×ø³¬¹ı10Õ¾ Ã¿100m+0.1Ôª£© */
-    Most_fast,     /*×î¿ìËÙÄ£Ê½*/
-    Least_change,   /*×îÉÙ»»³ËÄ£Ê½*/
-    Wanna_Pass,     /*ÆÚÍû¾­¹ıÄ£Ê½*/
-    Synthesize,     /*×ÛºÏÄ£Ê½*/
+    Most_save = 1, /*ï¿½î¾­ï¿½ï¿½Ä£Ê½  ï¿½ï¿½ï¿½ï¿½ï¿½ÇºÜ¶à³µï¿½ï¿½È«ï¿½Ì¶ï¿½ï¿½ï¿½2Ôª ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½10Õ¾ Ã¿100m+0.1Ôªï¿½ï¿½ */
+    Most_fast,     /*ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½*/
+    Least_change,   /*ï¿½ï¿½ï¿½Ù»ï¿½ï¿½ï¿½Ä£Ê½*/
+    Wanna_Pass,     /*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½*/
+    Synthesize,     /*ï¿½Ûºï¿½Ä£Ê½*/
 };
 
-enum Algorithm{     /*²ÉÓÃµÄËã·¨*/
-    Dijkstra = 1,   /*DijkstraËã·¨*/
-    DFS,            /*Éî¶ÈÓÅÏÈ*/
-    BFS,            /*¹ã¶ÈÓÅÏÈ*/
+enum Algorithm{     /*ï¿½ï¿½ï¿½Ãµï¿½ï¿½ã·¨*/
+    Dijkstra = 1,   /*Dijkstraï¿½ã·¨*/
+    DFS,            /*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    BFS,            /*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 };
 
 enum Exit{
@@ -123,7 +123,7 @@ Nets Initialize_Nets(){
     FILE *fp_line = fopen("D://C_learn/DSCD/lines.txt","r");
     FILE *fp_distance = fopen("D://C_learn/DSCD/distance.txt","r");
 
-    /* ³õÊ¼»¯Õ¾µã */
+    /*åˆå§‹åŒ–ç«™ç‚¹*/
     for(;stations_num<Total_stations;stations_num++){
         char str[1024]={'\0'};
         fscanf(fp_station,"%s",str);
@@ -138,8 +138,8 @@ Nets Initialize_Nets(){
         stations[stations_num] = *station;
     }
 
-    /* ³õÊ¼»¯Â·Ïß */
 
+    /*åˆå§‹åŒ–çº¿è·¯*/
     for(;lines_num<Total_lines;lines_num++){
         char sta[100],str[100];
         int dis;
@@ -183,7 +183,7 @@ Nets Initialize_Nets(){
         }
     }
 
-
+    /*ä¸ºç«™ç‚¹æ·»åŠ å‰åç«™ç‚¹ä»¥åŠçº¿è·¯*/
     for(int i=0;i<Total_lines;i++) {
         Node *n = lines[i].head;
         while(n->next!=nullptr){
@@ -287,11 +287,11 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
     }
     else{
         if(alg==Dijkstra){
-            int distance[Total_stations]; /*¶¥µãµ½ÆäÓà¸÷¶¥µãµÄ×î¶ÌÂ·¾¶³¤¶È*/
+            int distance[Total_stations];
             for(int & i : distance){i=MAX_DISTANCE;}
-            int path[Total_stations] = {-1}; /*×î¶ÌÂ·¾¶µÄÇ°Ò»¸ö¶¥µãÏÂ±ê*/
+            int path[Total_stations] = {-1};
             for(int & i : path){i=-1;}
-            int set[Total_stations] = {_UNUSED}; /*¶¥µãÊÇ·ñ±»²¢Èë×î¶ÌÂ·¾¶*/
+            int set[Total_stations] = {_UNUSED};
             int pass[Total_stations];
             for(int & pas : pass){pas=-1;}
 
@@ -321,7 +321,7 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
             }
             int x = sta2_id;
             while(x!=sta1_id){
-                printf("(%s)%s->",nets.lines[pass[x]].name,nets.stations[x].name);
+                printf("%s->ä¹˜å%s->",nets.stations[x].name,nets.lines[pass[x]].name);
                 x = path[x];
             }
             printf("%s distance:%d",nets.stations[sta1_id].name,distance[sta2_id]);
@@ -336,24 +336,24 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
 }
 
 /*
- * Nets -> stations[] / lines[] {½»Í¨Íø -> Õ¾Êı×é / ÏßÊı×é
+ * Nets -> stations[] / lines[]
  *
- * Station -> station_id        {³µÕ¾ -> ³µÕ¾id / ³µÕ¾Ãû³Æ / ³µÕ¾Áì½Ó±í}
+ * Station -> station_id
  *          / name
  *          / Station_Edge
  *
- * Station_Edge -> next_adj_station_id  {³µÕ¾Áì½Ó±í -> ÏÂÒ»Õ¾³µÕ¾id / ÉÏÒ»Õ¾³µÕ¾id / ÏÂÒ»Õ¾¾àÀë / ÉÏÒ»Õ¾¾àÀë / ËùÔÚÏßÂ·id / ÏÂÒ»¸ö³µÕ¾Áì½Ó¹ØÏµ}
+ * Station_Edge -> next_adj_station_id
  *              / pre_adj_station_id
  *              / next_instance
  *              / pre_instance
  *              / line_id
  *              / station_edge* next
  *
- * Line -> line_id {ÏßÂ· -> ÏßÂ·id / ÏßÂ·Ãû³Æ / ÏßÂ·Ê×Õ¾Í·½áµã}
+ * Line -> line_id
  *      / name
  *      / Node* head
  *
- * Node -> station_id   {³µÕ¾½Úµã -> ³µÕ¾id / ÏÂÒ»Õ¾¾àÀë / ÉÏÒ»Õ¾¾àÀë / ÉÏÒ»Õ¾½Úµã / ÏÂÒ»Õ¾½Úµã}
+ * Node -> station_id
  *  / next_distance
  *  / pre_distance
  *  / Node* next
@@ -368,7 +368,7 @@ int main() {
 //    Show_Lines(nets);
     char sta1[512] = {0};
     char sta2[512] = {0};
-    char scanfTip[512] = "ÇëÊäÈë³ö·¢Õ¾µã Ä¿±êÕ¾µã:";
+    char scanfTip[512] = "è¯·è¾“å…¥èµ·å§‹ç«™ç‚¹ ç»ˆæ­¢ç«™ç‚¹:";
     printf("%s",scanfTip);
     fflush(stdout);
     scanf("%s %s",sta2,sta1);
