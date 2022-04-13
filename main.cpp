@@ -361,16 +361,24 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
  *
  * */
 
+#include <graphics.h>
+
+void test(){
+    initgraph(800,600);
+    getch();
+    closegraph();
+}
 
 int main() {
 //    system("chcp 65001");
-    Nets nets = Initialize_Nets();
+//    Nets nets = Initialize_Nets();
 //    Show_Lines(nets);
-    char sta1[512] = {0};
-    char sta2[512] = {0};
-    char scanfTip[512] = "请输入起始站点 终止站点:";
-    printf("%s",scanfTip);
-    fflush(stdout);
-    scanf("%s %s",sta2,sta1);
-    Go(nets,sta1,sta2,Most_fast,Dijkstra);
+//    char sta1[512] = {0};
+//    char sta2[512] = {0};
+//    char scanfTip[512] = "请输入起始站点 终止站点:";
+//    printf("%s",scanfTip);
+//    fflush(stdout);
+//    scanf("%s %s",sta2,sta1);
+//    Go(nets,sta1,sta2,Most_fast,Dijkstra);
+    test();
 }
