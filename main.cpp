@@ -11,23 +11,20 @@ const int Total_stations =3431;
 const int  MAX_DISTANCE=9999999;
 
 
-/*
- * ����վ��Ϊ�ڵ�v,������·��Ϊ��ϵe.
- * ʹ����ӱ��������ݽṹ
- * */
+
 
 enum Mode{
-    Most_save = 1, /*���ģʽ  �����Ǻܶ೵��ȫ�̶���2Ԫ ���߳�������10վ ÿ100m+0.1Ԫ�� */
-    Most_fast,     /*�����ģʽ*/
-    Least_change,   /*���ٻ���ģʽ*/
-    Wanna_Pass,     /*��������ģʽ*/
-    Synthesize,     /*�ۺ�ģʽ*/
+    Most_save = 1,
+    Most_fast,
+    Least_change,
+    Wanna_Pass,
+    Synthesize,
 };
 
-enum Algorithm{     /*���õ��㷨*/
-    Dijkstra = 1,   /*Dijkstra�㷨*/
-    DFS,            /*�������*/
-    BFS,            /*�������*/
+enum Algorithm{
+    Dijkstra = 1,
+    DFS,
+    BFS,
 };
 
 enum Exit{
@@ -396,7 +393,9 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
 
 void test(){
     initgraph(800,600);
-
+    setbkcolor(WHITE);
+    setfillcolor(RED);
+    bar(50,100,60,110); /*x坐标50 - 60 , y 坐标 100 - 110*/
     getch();
     closegraph();
 }
@@ -404,14 +403,14 @@ void test(){
 int main() {
 //    system("chcp 65001");
     Nets nets = Initialize_Nets();
-    Show_Lines(nets);
-//    char sta1[512] = {0};
-//    char sta2[512] = {0};
-//    char scanfTip[512] = "请输入起始站点 终止站点:";
-//    printf("%s",scanfTip);
-//    fflush(stdout);
-//    scanf("%s %s",sta2,sta1);
-//    Go(nets,sta1,sta2,Most_fast,Dijkstra);
+//    Show_Lines(nets);
+    char sta1[512] = {0};
+    char sta2[512] = {0};
+    char scanfTip[512] = "请输入起始站点 终止站点:";
+    printf("%s",scanfTip);
+    fflush(stdout);
+    scanf("%s %s",sta2,sta1);       /* 测试用例 ：重庆北站南广场站 大石坝二村站*/
+    Go(nets,sta1,sta2,Most_fast,Dijkstra);
 //    test();
 
 
