@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <graphics.h>
 
 #define _USED 1
 #define _UNUSED 0
@@ -46,6 +47,8 @@ typedef struct station_edge{
 typedef struct station{
     int station_id;
     char name[512];
+    float poi_x;
+    float poi_y;
     Station_Edge *first;
 }Station;
 
@@ -122,6 +125,8 @@ Nets Initialize_Nets(){
     FILE *fp_station = fopen("D://C_learn/DSCD/stations.txt","r");
     FILE *fp_line = fopen("D://C_learn/DSCD/lines.txt","r");
     FILE *fp_distance = fopen("D://C_learn/DSCD/distance.txt","r");
+    FILE *fp_poi = fopen("D://C_learn/DSCD/station_poi.txt","r");
+
 
     /*初始化站点*/
     for(;stations_num<Total_stations;stations_num++){
@@ -196,12 +201,33 @@ Nets Initialize_Nets(){
         }
     }
 
+
+    for(int i=0;i<Total_stations;i++){
+        char name[512] = {'\0'};
+        fscanf(fp_poi,"%s",name);
+        for(auto & station: stations){
+            if(strcmp(name,station.name)==0){
+                float x,y;
+                char cx[30]={'\0'};char cy[30]={'\0'};
+                fscanf(fp_poi,"%s",cx);
+                fscanf(fp_poi,"%s",cy);
+                x = strtof(cx,NULL);
+                y = strtof(cy,NULL);
+                station.poi_x = x;
+                station.poi_y = y;
+                break;
+            }
+        }
+    }
+
+
     for(int i=0;i<Total_lines;i++){
         nets->lines[i] = lines[i];
     }
     for(int j=0;j<Total_stations;j++){
         nets->stations[j] = stations[j];
     }
+
     fclose(fp_line);
     fclose(fp_distance);
     fclose(fp_station);
@@ -228,17 +254,20 @@ void Show_Lines(Nets nets){
 //        printf("\n");
 //    }
 
-    for(int j=0;j<Total_stations;j++){
-        printf("%d %s ",j,nets.stations[j].name);
-//        printf("%s",nets.stations[nets.stations[j].first->next->next_adj_station_id].name);
-        Station_Edge* p = nets.stations[j].first->next;
-        while(p!= nullptr){
-            printf("(%s %s)",nets.stations[p->pre_adj_station_id].name,nets.lines[p->line_id].name);
-            p = p->next;
-        }
-        printf("\n");
-    }
+//    for(int j=0;j<Total_stations;j++){
+//        printf("%d %s ",j,nets.stations[j].name);
+////        printf("%s",nets.stations[nets.stations[j].first->next->next_adj_station_id].name);
+//        Station_Edge* p = nets.stations[j].first->next;
+//        while(p!= nullptr){
+//            printf("(%s %s)",nets.stations[p->pre_adj_station_id].name,nets.lines[p->line_id].name);
+//            p = p->next;
+//        }
+//        printf("\n");
+//    }
 
+    for(auto & station:stations){
+        printf("%f ,%f \n",station.poi_x,station.poi_y);
+    }
 }
 
 void Dijkstra_(int* pass,int* distance,int* path,int* set,Nets nets,int sta1_id){
@@ -335,6 +364,8 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
     }
 }
 
+
+
 /*
  * Nets -> stations[] / lines[]
  *
@@ -361,18 +392,19 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
  *
  * */
 
-#include <graphics.h>
+
 
 void test(){
     initgraph(800,600);
+
     getch();
     closegraph();
 }
 
 int main() {
 //    system("chcp 65001");
-//    Nets nets = Initialize_Nets();
-//    Show_Lines(nets);
+    Nets nets = Initialize_Nets();
+    Show_Lines(nets);
 //    char sta1[512] = {0};
 //    char sta2[512] = {0};
 //    char scanfTip[512] = "请输入起始站点 终止站点:";
@@ -380,5 +412,8 @@ int main() {
 //    fflush(stdout);
 //    scanf("%s %s",sta2,sta1);
 //    Go(nets,sta1,sta2,Most_fast,Dijkstra);
-    test();
+//    test();
+
+
 }
+
