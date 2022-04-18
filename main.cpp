@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 #include <cstring>
 #include <graphics.h>
@@ -43,7 +44,7 @@ typedef struct station_edge{
 
 typedef struct station{
     int station_id;
-    char name[512];
+    char name[128];
     float poi_x;
     float poi_y;
     Station_Edge *first;
@@ -59,7 +60,7 @@ typedef struct node{
 
 typedef struct line{
     int line_id;
-    char name[512];
+    char name[128];
     node* head;
 }Line;
 
@@ -67,6 +68,14 @@ typedef struct {
     Station stations[Total_stations];
     Line lines[Total_lines];
 }Nets;
+
+
+typedef struct{
+    int station_id;
+    int line_id;
+    int x_axis;
+    int y_axis;
+}Poi;
 
 Station* Create_Station(char* name,int station_id,station_edge* first){
     auto *station = (Station*)malloc(sizeof(Station));
@@ -200,7 +209,7 @@ Nets Initialize_Nets(){
 
 
     for(int i=0;i<Total_stations;i++){
-        char name[512] = {'\0'};
+        char name[128] = {'\0'};
         fscanf(fp_poi,"%s",name);
         for(auto & station: stations){
             if(strcmp(name,station.name)==0){
@@ -301,6 +310,73 @@ void Dijkstra_(int* pass,int* distance,int* path,int* set,Nets nets,int sta1_id)
     }
 }
 
+void test(Poi *pois){
+    initgraph(1200,1200);
+    setbkcolor(WHITE);
+    setfillcolor(BLACK);
+
+    int i=0;
+    while(pois[i].x_axis !=0){
+        printf("%d %d %s\n",pois[i].x_axis,pois[i].y_axis,stations[pois[i].station_id].name);
+//        putpixel(pois[i].x_axis,pois[i].y_axis,BLACK);
+        bar(pois[i].x_axis,pois[i].y_axis,pois[i].x_axis+10,pois[i].y_axis+10);
+//        getch();
+        outtextxy(pois[i].x_axis,pois[i].y_axis-10,stations[pois[i].station_id].name);
+        i++;
+    }
+
+    //    bar(50,100,60,110); /*x坐标50 - 60 , y 坐标 100 - 110*/
+    getch();
+    closegraph();
+}
+
+void StandardPoi(const int *path,const int *pass,int start,int end,Poi *pois){
+    int seq[2][200];
+    for(int i=0;i<200;i++){
+        seq[0][i] = -1;
+        seq[1][i] = -1;
+    }
+    int sequence = 0;
+    int x = end;
+    while(path[x] != start){
+        seq[0][sequence] = x;
+        seq[1][sequence++]=pass[x];
+        x = path[x];
+    }
+
+    /* 使用MinMax标准处理poi数据 */
+    int j=0;
+    float X[50] = {0};
+    float Y[50] = {0};
+    int S_X[50] = {0};
+    int S_Y[50] = {0};
+    float max_x = -999.0;
+    float min_x = 999999.0;
+    float max_y = -999.0;
+    float min_y = 999999.0;
+    while(seq[0][j]!=-1){
+        X[j] = stations[seq[0][j]].poi_x;
+        Y[j] = stations[seq[0][j]].poi_y;
+        if(X[j]>max_x){max_x = X[j];}
+        if(Y[j]>max_y){max_y = Y[j];}
+        if(X[j]<min_x){min_x = X[j];}
+        if(Y[j]<min_y){min_y = Y[j];}
+        j++;
+    }
+    j = 0;
+    while(X[j+1]!=0 && Y[j+1]!=0){
+        Poi*  poixy =(Poi *) malloc(sizeof(Poi));
+        X[j] = (X[j] - min_x)/(max_x - min_x);
+        Y[j] = (Y[j] - min_y)/(max_x - min_x);
+        poixy->x_axis =  floor((double)X[j]*1000);
+        poixy->y_axis = floor((double)Y[j]*1000);
+        poixy->station_id = seq[0][j];
+        poixy->line_id = seq[1][j];
+        pois[j] = *poixy;
+        j++;
+    }
+}
+
 void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
     int sta1_id=-1,sta2_id=-1;
     for(int id=0;id<Total_stations;id++){
@@ -346,11 +422,21 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
                 Dijkstra_(pass,distance,path,set,nets,sta1_id);
             }
             int x = sta2_id;
+            Poi pois[50];
+            StandardPoi(path,pass,sta1_id,sta2_id,pois);
+            int x1 = 0;
+//            while(pois[x1].x_axis!=0){
+//                printf("%d ,%d ,%d ,%d \n",pois[x1].x_axis,pois[x1].y_axis,pois[x1].station_id,pois[x1].line_id);
+//                x1++;
+//            }
+
             while(x!=sta1_id){
                 printf("%s->乘坐%s->",nets.stations[x].name,nets.lines[pass[x]].name);
                 x = path[x];
             }
             printf("%s distance:%d",nets.stations[sta1_id].name,distance[sta2_id]);
+            fflush(stdout);
+            test(pois);
         }
         if(alg==DFS){
 
@@ -391,22 +477,15 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
 
 
 
-void test(){
-    initgraph(800,600);
-    setbkcolor(WHITE);
-    setfillcolor(RED);
-    bar(50,100,60,110); /*x坐标50 - 60 , y 坐标 100 - 110*/
-    getch();
-    closegraph();
-}
+
 
 int main() {
 //    system("chcp 65001");
     Nets nets = Initialize_Nets();
 //    Show_Lines(nets);
-    char sta1[512] = {0};
-    char sta2[512] = {0};
-    char scanfTip[512] = "请输入起始站点 终止站点:";
+    char sta1[128] = {0};
+    char sta2[128] = {0};
+    char scanfTip[128] = "请输入起始站点 终止站点:";
     printf("%s",scanfTip);
     fflush(stdout);
     scanf("%s %s",sta2,sta1);       /* 测试用例 ：重庆北站南广场站 大石坝二村站*/
