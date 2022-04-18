@@ -3,6 +3,7 @@
 #include <cstring>
 #include <graphics.h>
 
+
 #define _USED 1
 #define _UNUSED 0
 #define _DROPED -1
@@ -134,7 +135,7 @@ Nets Initialize_Nets(){
     FILE *fp_poi = fopen("D://C_learn/DSCD/station_poi.txt","r");
 
 
-    /*åˆå§‹åŒ–ç«™ç‚¹*/
+    /*³õÊ¼»¯Õ¾µã*/
     for(;stations_num<Total_stations;stations_num++){
         char str[1024]={'\0'};
         fscanf(fp_station,"%s",str);
@@ -150,7 +151,7 @@ Nets Initialize_Nets(){
     }
 
 
-    /*åˆå§‹åŒ–çº¿è·¯*/
+    /*³õÊ¼»¯ÏßÂ·*/
     for(;lines_num<Total_lines;lines_num++){
         char sta[100],str[100];
         int dis;
@@ -194,7 +195,7 @@ Nets Initialize_Nets(){
         }
     }
 
-    /*ä¸ºç«™ç‚¹æ·»åŠ å‰åç«™ç‚¹ä»¥åŠçº¿è·¯*/
+    /*ÎªÕ¾µãÌí¼ÓÇ°ºóÕ¾µãÒÔ¼°ÏßÂ·*/
     for(int i=0;i<Total_lines;i++) {
         Node *n = lines[i].head;
         while(n->next!=nullptr){
@@ -325,7 +326,7 @@ void test(Poi *pois){
         i++;
     }
 
-    //    bar(50,100,60,110); /*xåæ ‡50 - 60 , y åæ ‡ 100 - 110*/
+    //    bar(50,100,60,110); /*x×ø±ê50 - 60 , y ×ø±ê 100 - 110*/
     getch();
     closegraph();
 }
@@ -344,7 +345,7 @@ void StandardPoi(const int *path,const int *pass,int start,int end,Poi *pois){
         x = path[x];
     }
 
-    /* ä½¿ç”¨MinMaxæ ‡å‡†å¤„ç†poiæ•°æ® */
+    /* Ê¹ÓÃMinMax±ê×¼´¦ÀípoiÊı¾İ */
     int j=0;
     float X[50] = {0};
     float Y[50] = {0};
@@ -431,7 +432,7 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
 //            }
 
             while(x!=sta1_id){
-                printf("%s->ä¹˜å%s->",nets.stations[x].name,nets.lines[pass[x]].name);
+                printf("%s->³Ë×ø%s->",nets.stations[x].name,nets.lines[pass[x]].name);
                 x = path[x];
             }
             printf("%s distance:%d",nets.stations[sta1_id].name,distance[sta2_id]);
@@ -485,10 +486,10 @@ int main() {
 //    Show_Lines(nets);
     char sta1[128] = {0};
     char sta2[128] = {0};
-    char scanfTip[128] = "è¯·è¾“å…¥èµ·å§‹ç«™ç‚¹ ç»ˆæ­¢ç«™ç‚¹:";
+    char scanfTip[128] = "ÇëÊäÈëÆğÊ¼Õ¾µã ÖÕÖ¹Õ¾µã:";
     printf("%s",scanfTip);
     fflush(stdout);
-    scanf("%s %s",sta2,sta1);       /* æµ‹è¯•ç”¨ä¾‹ ï¼šé‡åº†åŒ—ç«™å—å¹¿åœºç«™ å¤§çŸ³åäºŒæ‘ç«™*/
+    scanf("%s %s",sta2,sta1);       /* ²âÊÔÓÃÀı £ºÖØÇì±±Õ¾ÄÏ¹ã³¡Õ¾ ´óÊ¯°Ó¶ş´åÕ¾*/
     Go(nets,sta1,sta2,Most_fast,Dijkstra);
 //    test();
 
