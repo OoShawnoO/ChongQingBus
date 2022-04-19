@@ -312,17 +312,34 @@ void Dijkstra_(int* pass,int* distance,int* path,int* set,Nets nets,int sta1_id)
 }
 
 void test(Poi *pois){
-    initgraph(1200,1200);
+    initgraph(600,600);
     setbkcolor(WHITE);
     setfillcolor(BLACK);
-
+    setlinewidth(2);
+    ege_enable_aa(true);
     int i=0;
-    while(pois[i].x_axis !=0){
+    while(!(pois[i].x_axis==0&&pois[i].y_axis==0&&pois[i].station_id==0&&pois[i].line_id==0)){
+
         printf("%d %d %s\n",pois[i].x_axis,pois[i].y_axis,stations[pois[i].station_id].name);
 //        putpixel(pois[i].x_axis,pois[i].y_axis,BLACK);
-        bar(pois[i].x_axis,pois[i].y_axis,pois[i].x_axis+10,pois[i].y_axis+10);
+        bar(pois[i].x_axis/2+100,pois[i].y_axis/2,pois[i].x_axis/2+10+100,pois[i].y_axis/2+10);
+
 //        getch();
-        outtextxy(pois[i].x_axis,pois[i].y_axis-10,stations[pois[i].station_id].name);
+        outtextxy(pois[i].x_axis/2-20+100,pois[i].y_axis/2+20,stations[pois[i].station_id].name);
+
+        if(i==0){
+            moveto(pois[i].x_axis/2+100,pois[i].y_axis/2+5);
+        }
+        else{
+            moveto(pois[i-1].x_axis/2+5+100,pois[i-1].y_axis/2+5);
+        }
+        int x = getx();
+        int y = gety();
+        ege::ege_line(float(x), float(y), float(pois[i].x_axis / 2 + 5+100), float(pois[i].y_axis / 2 + 5));
+        if(i>0){
+            ege::outtextxy(x-((x-(pois[i].x_axis/2+5+100))/2),y-((y-(pois[i].y_axis)/2+5)/2),lines[pois[i].line_id].name);
+        }
+
         i++;
     }
 
@@ -351,9 +368,9 @@ void StandardPoi(const int *path,const int *pass,int start,int end,Poi *pois){
     float Y[50] = {0};
     int S_X[50] = {0};
     int S_Y[50] = {0};
-    float max_x = -999.0;
+    float max_x = -99999.0;
     float min_x = 999999.0;
-    float max_y = -999.0;
+    float max_y = -99999.0;
     float min_y = 999999.0;
     while(seq[0][j]!=-1){
         X[j] = stations[seq[0][j]].poi_x;
@@ -368,7 +385,7 @@ void StandardPoi(const int *path,const int *pass,int start,int end,Poi *pois){
     while(X[j+1]!=0 && Y[j+1]!=0){
         Poi*  poixy =(Poi *) malloc(sizeof(Poi));
         X[j] = (X[j] - min_x)/(max_x - min_x);
-        Y[j] = (Y[j] - min_y)/(max_x - min_x);
+        Y[j] = (Y[j] - min_y)/(max_y - min_y);
         poixy->x_axis =  floor((double)X[j]*1000);
         poixy->y_axis = floor((double)Y[j]*1000);
         poixy->station_id = seq[0][j];
@@ -489,7 +506,7 @@ int main() {
     char scanfTip[128] = "请输入起始站点 终止站点:";
     printf("%s",scanfTip);
     fflush(stdout);
-    scanf("%s %s",sta2,sta1);       /* 测试用例 ：重庆北站南广场站 大石坝二村站*/
+    scanf("%s %s",sta2,sta1);       /* 测试用例 ：重庆北站南广场站 大石坝二村站*/ /*重庆北站南广场站 小什字站*/
     Go(nets,sta1,sta2,Most_fast,Dijkstra);
 //    test();
 
