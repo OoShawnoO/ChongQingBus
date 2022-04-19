@@ -80,7 +80,7 @@ typedef struct{
 
 Station* Create_Station(char* name,int station_id,station_edge* first){
     auto *station = (Station*)malloc(sizeof(Station));
-    strcpy(station->name,name);
+    strcpy_s(station->name,name);
     station->station_id = station_id;
     station->first = first;
     return station;
@@ -91,7 +91,7 @@ static Line lines[Total_lines];
 
 Line* Create_Line(char* name,int line_id,Node* head){
     auto *line = (Line*)malloc(sizeof(Line));
-    strcpy(line->name,name);
+    strcpy_s(line->name,name);
     line->line_id = line_id;
     line->head = head;
     return line;
@@ -129,10 +129,15 @@ Nets Initialize_Nets(){
 
     int stations_num=0,lines_num=0;
 
-    FILE *fp_station = fopen("D://C_learn/DSCD/stations.txt","r");
-    FILE *fp_line = fopen("D://C_learn/DSCD/lines.txt","r");
-    FILE *fp_distance = fopen("D://C_learn/DSCD/distance.txt","r");
-    FILE *fp_poi = fopen("D://C_learn/DSCD/station_poi.txt","r");
+//    FILE *fp_station = fopen("D://C_learn/DSCD/stations.txt","r");
+//    FILE *fp_line = fopen("D://C_learn/DSCD/lines.txt","r");
+//    FILE *fp_distance = fopen("D://C_learn/DSCD/distance.txt","r");
+//    FILE *fp_poi = fopen("D://C_learn/DSCD/station_poi.txt","r");
+    FILE *fp_station,*fp_line,*fp_distance,*fp_poi;
+    fopen_s(&fp_station,"D://C_learn/DSCD/stations.txt","r");
+    fopen_s(&fp_line,"D://C_learn/DSCD/lines.txt","r");
+    fopen_s(&fp_distance,"D://C_learn/DSCD/distance.txt","r");
+    fopen_s(&fp_poi,"D://C_learn/DSCD/station_poi.txt","r");
 
 
     /*≥ı ºªØ’æµ„*/
@@ -320,7 +325,7 @@ void test(Poi *pois){
     int i=0;
     while(!(pois[i].x_axis==0&&pois[i].y_axis==0&&pois[i].station_id==0&&pois[i].line_id==0)){
 
-        printf("%d %d %s\n",pois[i].x_axis,pois[i].y_axis,stations[pois[i].station_id].name);
+//        printf("%d %d %s\n",pois[i].x_axis,pois[i].y_axis,stations[pois[i].station_id].name);
 //        putpixel(pois[i].x_axis,pois[i].y_axis,BLACK);
         bar(pois[i].x_axis/2+100,pois[i].y_axis/2,pois[i].x_axis/2+10+100,pois[i].y_axis/2+10);
 
@@ -441,6 +446,14 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
             }
             int x = sta2_id;
             Poi pois[50];
+            for(int i=0;i<50;i++){
+                Poi *poix = (Poi*)malloc(sizeof(Poi));
+                poix->x_axis=0;
+                poix->y_axis=0;
+                poix->line_id=0;
+                poix->station_id=0;
+                pois[i] = *poix;
+            }
             StandardPoi(path,pass,sta1_id,sta2_id,pois);
             int x1 = 0;
 //            while(pois[x1].x_axis!=0){
