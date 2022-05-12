@@ -33,6 +33,12 @@ enum Exit{
     Not_Found = 1,
 };
 
+enum Action{
+    Next = 1,
+    Front,
+    Rear,
+};
+
 typedef struct station_edge{
     int next_adj_station_id;
     int pre_adj_station_id;
@@ -45,7 +51,7 @@ typedef struct station_edge{
 
 typedef struct station{
     int station_id;
-    char name[128];
+    char name[64];
     float poi_x;
     float poi_y;
     Station_Edge *first;
@@ -61,7 +67,7 @@ typedef struct node{
 
 typedef struct line{
     int line_id;
-    char name[128];
+    char name[64];
     node* head;
 }Line;
 
@@ -77,6 +83,79 @@ typedef struct{
     int x_axis;
     int y_axis;
 }Poi;
+
+typedef struct QNode{
+    int station_id;
+    int front_id;
+    int line_id;
+    int distance;
+    QNode* next;
+}QNode;
+
+typedef struct{
+    QNode* head;
+    int rear;
+    int front;
+}LinkQueue;
+
+LinkQueue* InitQueue(){
+    LinkQueue* linkQueue =(LinkQueue*)malloc(sizeof(LinkQueue));
+    QNode *head = (QNode*)malloc(sizeof(QNode));
+    head->next = nullptr;
+    head->station_id = -1;
+    head->front_id = -1;
+    head->line_id = -1;
+    head->distance = -1;
+    linkQueue->head = head;
+    linkQueue->rear = 1;
+    linkQueue->front = 1;
+    return linkQueue;
+}
+
+int existQueue(LinkQueue* linkQueue,int station_id){
+    auto ptr = linkQueue->head;
+    while(ptr->next){
+        if(station_id == ptr->station_id){return 1;}
+        ptr = ptr->next;
+    }
+    return 0;
+}
+
+void InQueue(LinkQueue* linkQueue,int station_id,int front_id,int line_id,int distance){
+    if(!existQueue(linkQueue,station_id)){
+        auto ptr = linkQueue->head;
+        QNode* node = (QNode*)malloc(sizeof(QNode));
+        node->station_id = station_id;
+        node->front_id = front_id;
+        node->line_id = line_id;
+        node->distance = distance;
+        node->next = nullptr;
+        linkQueue->rear++;
+        while(ptr->next){
+            ptr = ptr->next;
+        }
+        ptr->next = node;
+    }
+    else{
+        return;
+    }
+}
+
+void OutQueue(LinkQueue* linkQueue,int* station_id){
+    if(linkQueue->front<=linkQueue->rear){
+        auto ptr = linkQueue->head;
+        int i = 0;
+        while(i<linkQueue->front){
+            ptr = ptr->next;
+            i++;
+        }
+        *station_id = ptr->station_id;
+        linkQueue->front++;
+    }
+    else{
+        exit(1000);
+    }
+}
 
 Station* Create_Station(char* name,int station_id,station_edge* first){
     auto *station = (Station*)malloc(sizeof(Station));
@@ -316,6 +395,47 @@ void Dijkstra_(int* pass,int* distance,int* path,int* set,Nets nets,int sta1_id)
     }
 }
 
+int Compare(int* sta1_line,int* sta2_line){
+    for(int i=0;i<Total_lines;i++){
+        if(sta1_line[i]!=-1&&sta2_line[i]!=-1){
+            return i;
+        }
+    }
+    return 0;
+}
+
+void DoFind(int* sta_line,int sta_id,int* set){
+    station_edge* head = stations[sta_id].first;
+    if(set[sta_id]!=_USED){
+        set[sta_id] = _USED;
+        while(head->next){
+            if(sta_line[head->line_id]==-1){
+                sta_line[head->line_id] = head->current_station_id;
+            }
+            head = head->next;
+        }
+    }
+    else{
+        return;
+    }
+}
+
+void FindWay(LinkQueue* linkQueue,int station_id,int* pass,int* path,int* distance){
+    auto ptr = linkQueue->head->next;
+    while(ptr->station_id!=station_id){
+        ptr = ptr->next;
+    }
+    if(ptr->front_id!=-1){
+        pass[station_id] = ptr->front_id;
+        path[station_id] = ptr->line_id;
+        distance[station_id] = ptr->distance;
+        FindWay(linkQueue,ptr->front_id,pass,path,distance);
+    }
+    else{
+        return;
+    }
+}
+
 void test(Poi *pois){
     initgraph(600,600);
     setbkcolor(WHITE);
@@ -411,7 +531,7 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
         exit(Not_Found);
     }
     else{
-        if(alg==Dijkstra){
+        if(alg==Dijkstra&&mode==Most_fast){
             int distance[Total_stations];
             for(int & i : distance){i=MAX_DISTANCE;}
             int path[Total_stations] = {-1};
@@ -469,11 +589,56 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
             fflush(stdout);
             test(pois);
         }
-        if(alg==DFS){
+        if(alg==DFS&&mode==Most_fast){
 
         }
-        if(alg==BFS){
+        if(alg==BFS&&mode==Least_change){
+            int sta1_line[Total_lines];
+            int sta2_line[Total_lines];
+            int set[Total_stations];
+            int path[Total_stations];
+            int pass[Total_stations];
+            int distance[Total_stations];
+            for(int & i :  set){i = _UNUSED;}
+            for(int & i : sta1_line){i=-1;}
+            for(int & i : sta2_line){i=-1;}
+            for(int & i : pass){i=-1;}
+            for(int & i : path){i=-1;}
+            for(int & i : distance){i=-1;}
+            int sta1=sta1_id;
+            station_edge* head = stations[sta2_id].first;
+            while(head->next){
+                if(head->line_id!=-1){
+                    sta2_line[head->line_id] = head->current_station_id;
+                }
+                head = head->next;
+            }
+            station_edge* head1 = stations[sta1_id].first;
+            LinkQueue* linkQueue = InitQueue();
+            InQueue(linkQueue,sta1,-1,-1,-1);
 
+            while(Compare(sta1_line,sta2_line)==0){
+                DoFind(sta1_line,sta1,set);
+                auto ptr = stations[sta1].first->next;
+                while(ptr->next){
+                    if(ptr->pre_adj_station_id!=-1){
+                        InQueue(linkQueue,ptr->pre_adj_station_id,sta1,ptr->line_id,ptr->pre_distance);
+                    }
+                    if(ptr->next_adj_station_id!=-1){
+                        InQueue(linkQueue,ptr->next_adj_station_id,sta1,ptr->line_id,ptr->next_distance);
+                    }
+                    ptr = ptr->next;
+                }
+                OutQueue(linkQueue,&sta1);
+            }
+            int x = Compare(sta1_line,sta2_line);
+            printf("Find! at %s\n",lines[x].name);
+            int staid = sta1_line[x];
+            FindWay(linkQueue,staid,pass,path,distance);
+            while(pass[staid]!=-1){
+                printf("%d(%s)->",pass[staid],lines[path[staid]].name);
+                staid = pass[staid];
+            }
         }
     }
 }
@@ -520,8 +685,10 @@ int main() {
     printf("%s",scanfTip);
     fflush(stdout);
     scanf("%s %s",sta2,sta1);       /* 测试用例 ：重庆北站南广场站 大石坝二村站*/ /*重庆北站南广场站 小什字站*/
-    Go(nets,sta1,sta2,Most_fast,Dijkstra);
+//    Go(nets,sta1,sta2,Most_fast,Dijkstra);
+    Go(nets,sta1,sta2,Least_change,BFS);
 //    test();
+
 
 
 }
