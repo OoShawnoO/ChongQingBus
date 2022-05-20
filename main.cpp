@@ -142,7 +142,7 @@ void InQueue(LinkQueue* linkQueue,int station_id,int front_id,int line_id,int di
 }
 
 void OutQueue(LinkQueue* linkQueue,int* station_id){
-    if(linkQueue->front<=linkQueue->rear){
+    if(linkQueue->front<linkQueue->rear){
         auto ptr = linkQueue->head;
         int i = 0;
         while(i<linkQueue->front){
@@ -401,7 +401,7 @@ int Compare(int* sta1_line,int* sta2_line){
             return i;
         }
     }
-    return 0;
+    return -1;
 }
 
 void DoFind(int* sta_line,int sta_id,int* set){
@@ -609,7 +609,7 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
             station_edge* head = stations[sta2_id].first;
             while(head->next){
                 if(head->line_id!=-1){
-                    sta2_line[head->line_id] = head->current_station_id;
+                    sta2_line[head->line_id] = head->line_id;
                 }
                 head = head->next;
             }
@@ -617,7 +617,7 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
             LinkQueue* linkQueue = InitQueue();
             InQueue(linkQueue,sta1,-1,-1,-1);
 
-            while(Compare(sta1_line,sta2_line)==0){
+            while(Compare(sta1_line,sta2_line)==-1){
                 DoFind(sta1_line,sta1,set);
                 auto ptr = stations[sta1].first->next;
                 while(ptr->next){
@@ -633,12 +633,51 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
             }
             int x = Compare(sta1_line,sta2_line);
             printf("Find! at %s\n",lines[x].name);
+            station_edge* ptr = stations[sta2_id].first;
+            while(ptr->next){
+                if(ptr->line_id==x){
+                    break;
+                }
+                ptr = ptr->next;
+            }
+            printf("%s,%s\n",stations[ptr->next_adj_station_id].name,stations[ptr->pre_adj_station_id].name);
             int staid = sta1_line[x];
             FindWay(linkQueue,staid,pass,path,distance);
+            node* p = lines[x].head;
+            node* q = p;
+            int z=0,y=0;
+            while(p->station_id!=staid){
+                p = p->next;
+                z++;
+            }
+            while(q->station_id!=sta2_id){
+                q = q->next;
+                y++;
+            }
+            if(z>y){
+                while(q!=p){
+                    pass[q->station_id] =q->next->station_id ;
+                    path[q->station_id] = x;
+                    q = q->next;
+                }
+            }
+            else{
+                while(q!=p){
+                    pass[p->next->station_id] = p->station_id;
+                    path[p->station_id] = x;
+                    p = p->next;
+                }
+            }
+
+
+//            printf("%s(%s)->",stations[staid].name,lines[path[staid]].name);
+            staid = sta2_id;
+            path[sta2_id] = x;
             while(pass[staid]!=-1){
-                printf("%d(%s)->",pass[staid],lines[path[staid]].name);
+                printf("%s(%s)->",stations[staid].name,lines[path[staid]].name);
                 staid = pass[staid];
             }
+            printf("%s",stations[staid].name);
         }
     }
 }
