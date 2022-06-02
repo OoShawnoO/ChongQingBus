@@ -437,13 +437,13 @@ void FindWay(LinkQueue* linkQueue,int station_id,int* pass,int* path,int* distan
 }
 
 void test(Poi *pois){
-    initgraph(600,600);
+    initgraph(1000,1000);
     setbkcolor(WHITE);
     setfillcolor(BLACK);
     setlinewidth(2);
     ege_enable_aa(true);
     int i=0;
-    while(!(pois[i].x_axis==0&&pois[i].y_axis==0&&pois[i].station_id==0&&pois[i].line_id==0)){
+    while(!(pois[i].x_axis==-1&&pois[i].y_axis==-1&&pois[i].station_id==-1&&pois[i].line_id==-1)){
 
 //        printf("%d %d %s\n",pois[i].x_axis,pois[i].y_axis,stations[pois[i].station_id].name);
 //        putpixel(pois[i].x_axis,pois[i].y_axis,BLACK);
@@ -481,12 +481,15 @@ void StandardPoi(const int *path,const int *pass,int start,int end,Poi *pois){
     }
     int sequence = 0;
     int x = end;
-    while(path[x] != start){
+    int last = -1;
+    while(x != start){
         seq[0][sequence] = x;
         seq[1][sequence++]=pass[x];
+        last = pass[x];
         x = path[x];
     }
-
+    seq[0][sequence] = x;
+    seq[1][sequence++] = last;
     /* 使用MinMax标准处理poi数据 */
     int j=0;
     float X[50] = {0};
@@ -507,20 +510,33 @@ void StandardPoi(const int *path,const int *pass,int start,int end,Poi *pois){
         j++;
     }
     j = 0;
-    while(X[j+1]!=0 && Y[j+1]!=0){
+    int minx=9999,miny=9999,maxx=-1,maxy=-1;
+    while(X[j]!=0 && Y[j]!=0){
         Poi*  poixy =(Poi *) malloc(sizeof(Poi));
         X[j] = (X[j] - min_x)/(max_x - min_x);
         Y[j] = (Y[j] - min_y)/(max_y - min_y);
         poixy->x_axis =  floor((double)X[j]*1000);
+        if(poixy->x_axis<minx){minx=poixy->x_axis;}
+        if(poixy->x_axis>maxx){maxx=poixy->x_axis;}
         poixy->y_axis = floor((double)Y[j]*1000);
+        if(poixy->y_axis<miny){miny=poixy->y_axis;}
+        if(poixy->y_axis>maxy){maxy=poixy->y_axis;}
         poixy->station_id = seq[0][j];
         poixy->line_id = seq[1][j];
         pois[j] = *poixy;
         j++;
     }
+    int i = 0;
+    int avg_x = 1000/(maxx-minx);
+    int avg_y = 1000/(maxy-miny);
+    while(!(pois[i].x_axis==-1&&pois[i].y_axis==-1&&pois[i].station_id==-1&&pois[i].line_id==-1)){
+        pois[i].x_axis = (pois[i].x_axis-minx)*avg_x;
+        pois[i].y_axis = (pois[i].y_axis-miny)*avg_y;
+        i++;
+    }
 }
 
-void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
+void Go(Nets nets,char* station_1,char* station_2,Mode mode){
     int sta1_id=-1,sta2_id=-1;
     for(int id=0;id<Total_stations;id++){
         if(strcmp(nets.stations[id].name,station_1)==0){sta1_id = id;}
@@ -531,7 +547,7 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
         exit(Not_Found);
     }
     else{
-        if(alg==Dijkstra&&mode==Most_fast){
+        if(mode==Most_fast){
             int distance[Total_stations];
             for(int & i : distance){i=MAX_DISTANCE;}
             int path[Total_stations] = {-1};
@@ -568,10 +584,10 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
             Poi pois[50];
             for(int i=0;i<50;i++){
                 Poi *poix = (Poi*)malloc(sizeof(Poi));
-                poix->x_axis=0;
-                poix->y_axis=0;
-                poix->line_id=0;
-                poix->station_id=0;
+                poix->x_axis=-1;
+                poix->y_axis=-1;
+                poix->line_id=-1;
+                poix->station_id=-1;
                 pois[i] = *poix;
             }
             StandardPoi(path,pass,sta1_id,sta2_id,pois);
@@ -589,10 +605,7 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
             fflush(stdout);
             test(pois);
         }
-        if(alg==DFS&&mode==Most_fast){
-
-        }
-        if(alg==BFS&&mode==Least_change){
+        if(mode==Least_change){
             int sta1_line[Total_lines];
             int sta2_line[Total_lines];
             int set[Total_stations];
@@ -632,7 +645,7 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
                 OutQueue(linkQueue,&sta1);
             }
             int x = Compare(sta1_line,sta2_line);
-            printf("Find! at %s\n",lines[x].name);
+//            printf("Find! at %s\n",lines[x].name);
             station_edge* ptr = stations[sta2_id].first;
             while(ptr->next){
                 if(ptr->line_id==x){
@@ -640,7 +653,7 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
                 }
                 ptr = ptr->next;
             }
-            printf("%s,%s\n",stations[ptr->next_adj_station_id].name,stations[ptr->pre_adj_station_id].name);
+//            printf("%s,%s\n",stations[ptr->next_adj_station_id].name,stations[ptr->pre_adj_station_id].name);
             int staid = sta1_line[x];
             FindWay(linkQueue,staid,pass,path,distance);
             node* p = lines[x].head;
@@ -668,8 +681,6 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
                     p = p->next;
                 }
             }
-
-
 //            printf("%s(%s)->",stations[staid].name,lines[path[staid]].name);
             staid = sta2_id;
             path[sta2_id] = x;
@@ -678,6 +689,18 @@ void Go(Nets nets,char* station_1,char* station_2,Mode mode,Algorithm alg,...){
                 staid = pass[staid];
             }
             printf("%s",stations[staid].name);
+
+            Poi pois[50];
+            for(int i=0;i<50;i++){
+                Poi *poix = (Poi*)malloc(sizeof(Poi));
+                poix->x_axis=-1;
+                poix->y_axis=-1;
+                poix->line_id=-1;
+                poix->station_id=-1;
+                pois[i] = *poix;
+            }
+            StandardPoi(pass,path,sta1_id,sta2_id,pois);
+            test(pois);
         }
     }
 }
@@ -725,7 +748,7 @@ int main() {
     fflush(stdout);
     scanf("%s %s",sta2,sta1);       /* 测试用例 ：重庆北站南广场站 大石坝二村站*/ /*重庆北站南广场站 小什字站*/
 //    Go(nets,sta1,sta2,Most_fast,Dijkstra);
-    Go(nets,sta1,sta2,Least_change,BFS);
+    Go(nets,sta1,sta2,Most_fast);
 //    test();
 
 
