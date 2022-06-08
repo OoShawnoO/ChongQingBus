@@ -14,7 +14,7 @@ include_directories(${EGE_INC_DIR})
 link_directories(${EGE_LIB_DIR})
 
 
-add_executable(DSCD main.cpp)
+add_executable(DSCD sources/main.cpp sources/structures.h sources/Queue.h sources/Paint.h sources/Nets.h sources/dijkstra.h sources/bfs.h)
 
 #target_link_libraries(DSCD libgraphics64.a
 #        libgdi32.a libimm32.a libmsimg32.a libole32.a

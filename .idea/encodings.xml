@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding" defaultCharsetForPropertiesFiles="GBK">
-    <file url="file://$PROJECT_DIR$/distance.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/lines.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/main.cpp" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/station_poi.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/stations.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Resource/distance.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Resource/lines.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Resource/station_poi.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Resource/stations.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/sources/main.cpp" charset="GBK" />
     <file url="PROJECT" charset="GBK" />
   </component>
 </project>
