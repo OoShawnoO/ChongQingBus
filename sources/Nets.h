@@ -108,10 +108,10 @@ Nets Initialize_Nets() {
 //    FILE *fp_distance = fopen("D://C_learn/DSCD/distance.txt","r");
 //    FILE *fp_poi = fopen("D://C_learn/DSCD/station_poi.txt","r");
     FILE *fp_station, *fp_line, *fp_distance, *fp_poi;
-    fopen_s(&fp_station, "D://C_learn/DSCD/Resource/stations.txt", "r");
-    fopen_s(&fp_line, "D://C_learn/DSCD/Resource/lines.txt", "r");
-    fopen_s(&fp_distance, "D://C_learn/DSCD/Resource/distance.txt", "r");
-    fopen_s(&fp_poi, "D://C_learn/DSCD/Resource/station_poi.txt", "r");
+    fopen_s(&fp_station, "../Resource/stations.txt", "r");
+    fopen_s(&fp_line, "../Resource/lines.txt", "r");
+    fopen_s(&fp_distance, "../Resource/distance.txt", "r");
+    fopen_s(&fp_poi, "../Resource/station_poi.txt", "r");
 
 
     /*≥ı ºªØ’æµ„*/
