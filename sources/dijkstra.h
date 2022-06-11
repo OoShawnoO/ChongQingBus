@@ -117,7 +117,7 @@ int dijkstra(int sta1_id,int sta2_id,Nets nets){
     StandardPoi(path, pass, sta1_id, sta2_id, pois);
     int x1 = 0;
     while (x != sta1_id) {
-        printf("%s->³Ë×ø%s->", nets.stations[x].name, nets.lines[pass[x]].name);
+        printf("%s(%s)->", nets.stations[x].name, nets.lines[pass[x]].name);
         x = path[x];
     }
     printf("%s distance:%d", nets.stations[sta1_id].name, distance[sta2_id]);
