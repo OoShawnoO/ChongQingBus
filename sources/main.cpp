@@ -1,19 +1,14 @@
 #include <cmath>
+#include <windows.h>
 #include <iostream>
 #include <cstring>
-#include "Paint.h"
 #include "structures.h"
-#include "Queue.h"
 #include "Nets.h"
 #include "dijkstra.h"
 #include "bfs.h"
 
 Station stations[Total_stations];
 Line lines[Total_lines];
-
-
-
-
 
 /*
  * function Go -> 寻路主程序入口
@@ -29,7 +24,7 @@ Line lines[Total_lines];
  * return void;
  * */
 
-void Go(Nets nets, char *station_1, char *station_2, Mode mode) {
+int Go(const Nets nets, char *station_1, char *station_2, Mode mode) {
     int sta1_id = -1, sta2_id = -1;
     for (int id = 0; id < Total_stations; id++) {
         if (strcmp(nets.stations[id].name, station_1) == 0) { sta1_id = id; }
@@ -37,17 +32,18 @@ void Go(Nets nets, char *station_1, char *station_2, Mode mode) {
         if (sta1_id != -1 && sta2_id != -1) { break; }
     }
     if (sta1_id == -1 || sta2_id == -1) {
-        exit(Not_Found);
+        exit(No_Match);
     } else {
 
         if (mode == Most_fast) {
-            dijkstra(sta1_id,sta2_id,nets);
+            return dijkstra(sta1_id,sta2_id,nets);
         }
 
         if (mode == Least_change) {
-            bfs(sta1_id,sta2_id);
+            return bfs(sta1_id,sta2_id);
         }
     }
+    return ESC;
 }
 
 
@@ -78,18 +74,42 @@ void Go(Nets nets, char *station_1, char *station_2, Mode mode) {
  * */
 
 
-
+Nets nets = Initialize_Nets();
 
 int main() {
 //    system("chcp 65001");
-    Nets nets = Initialize_Nets();
-    char sta1[128] = {0};
-    char sta2[128] = {0};
-    char scanfTip[128] = "请输入起始站点 终止站点:";
-    printf("%s", scanfTip);
-    fflush(stdout);
-    scanf("%s %s", sta2, sta1);       /* 测试用例 ：重庆北站南广场站 大石坝二村站*/ /*重庆北站南广场站 小什字站*/
-    Go(nets, sta1, sta2, Most_fast);
-//    GUI();
+//    char sta1[128] = {0};
+//    char sta2[128] = {0};
+//    int flag = SPACE;
+//    Mode mode = Least_change;
+//    while(true){
+//        switch(flag){
+//            case ESC:{
+//                printf("结束。");
+//                exit(End);
+//            }
+//            case SPACE:{
+//                printf("---------------------------\n");
+//                printf("请选择模式：\n");
+//                printf("1.最快速模式\n2.最少换乘模式\n");
+//                printf("---------------------------\n");
+//                int x = 0;
+//                printf("请选择:");
+//                fflush(stdout);
+//                scanf("%d",&x);
+//                if(x==1){mode = Most_fast;}
+//                if(x==2){mode = Least_change;}
+//            }
+//            case CR:{
+//                printf("\n");
+//                char scanfTip[128] = "请输入起始站点 终止站点:";
+//                printf("%s", scanfTip);
+//                fflush(stdout);
+//                scanf("%s %s", sta2, sta1);       /* 测试用例 ：重庆北站南广场站 大石坝二村站*/ /*重庆北站南广场站 小什字站*/
+//                flag = Go(nets, sta1, sta2, mode);
+//            }
+//        }
+//    }
+        GUI();
 }
 

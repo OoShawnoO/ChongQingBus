@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "structures.h"
+#include "Paint.h"
 
 extern Station stations[Total_stations];
 extern Line lines[Total_lines];
@@ -67,7 +68,7 @@ void Dijkstra_(int *pass, int *distance, int *path, int *set, Nets nets, int sta
     }
 }
 
-void dijkstra(int sta1_id,int sta2_id,Nets nets){
+int dijkstra(int sta1_id,int sta2_id,Nets nets){
     /*最短路径模式*/
     /*初始化数据*/
     int distance[Total_stations];
@@ -121,7 +122,7 @@ void dijkstra(int sta1_id,int sta2_id,Nets nets){
     }
     printf("%s distance:%d", nets.stations[sta1_id].name, distance[sta2_id]);
     fflush(stdout);
-    test(pois);
+    return test(pois);
 }
 
 

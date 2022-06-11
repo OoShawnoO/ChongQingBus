@@ -9,6 +9,11 @@
 #define _UNUSED 0
 #define _DROPED -1
 
+#define ESC 27
+#define CR 13
+#define SPACE 32
+
+
 const int Total_lines = 528;
 const int Total_stations = 3431;
 const int MAX_DISTANCE = 9999999;
@@ -29,7 +34,8 @@ enum Algorithm {
 };
 
 enum Exit {
-    Not_Found = 1,
+    End = 1000,
+    No_Match = 1001,
 };
 
 enum Action {

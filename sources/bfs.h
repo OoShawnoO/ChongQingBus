@@ -87,7 +87,7 @@ void FindWay(LinkQueue *linkQueue, int station_id, int *pass, int *path, int *di
     }
 }
 
-void bfs(int sta1_id,int sta2_id){
+int bfs(int sta1_id,int sta2_id){
     /*最少换乘模式*/
     /*初始化数据*/
     int sta1_line[Total_lines];
@@ -185,7 +185,7 @@ void bfs(int sta1_id,int sta2_id){
         pois[i] = *poix;
     }
     StandardPoi(pass, path, sta1_id, sta2_id, pois);
-    test(pois);
+    return test(pois);
 }
 
 
