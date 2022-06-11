@@ -84,6 +84,7 @@ int main() {
     Mode mode = Least_change;
     initgraph(800,600);
     setrendermode(ege::RENDER_MANUAL);
+    setcaption("重庆公交查询系统");
     PIMAGE image = newimage();
     getimage(image, "../Resource/index.png");
     putimage(0, 0, image);
