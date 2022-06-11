@@ -25,9 +25,6 @@ int Go(const Nets nets, char *station_1, char *station_2, Mode mode);
  * */
 
 int test(Poi *pois) {
-    if(!is_run()){
-        initgraph(1000, 1000);
-    }
     setbkcolor(WHITE);
     setfillcolor(BLACK);
     setlinewidth(2);
@@ -59,10 +56,11 @@ int test(Poi *pois) {
     }
 
     //    bar(50,100,60,110); /*x坐标50 - 60 , y 坐标 100 - 110*/
-    xyprintf(500,600,"按任意键关闭。");
+    xyprintf(350,300,"回车继续查询");
+    xyprintf(350,320,"空格切换模式");
+    xyprintf(350,340,"ESC结束查询");
     int x = getch();
     cleardevice();
-    closegraph();
     return x;
 }
 
@@ -141,8 +139,8 @@ void StandardPoi(const int *path, const int *pass, int start, int end, Poi *pois
     }
 }
 
-void GUI() {
-    initgraph(1000, 800);
+void GUI(char* sta1,char* sta2) {
+    cleardevice();
     setbkcolor(WHITE);
     PIMAGE image = newimage();
     getimage(image, "../Resource/tj.png");
@@ -161,17 +159,20 @@ void GUI() {
     editBox2.setfont(40, 0, "");
     editBox2.visible(true);
 
-    char str1[200];
-    char str2[200];
+    delay_ms(0);
+
     while (true) {
+        flushmouse();
         if (mousemsg()) {
             mouse_msg msg = getmouse();
             if (msg.is_left()&&msg.x>=241&&msg.x<=560&&msg.y>=461&&msg.y<=567) {
-                editBox1.gettext(200, str1);
-                editBox2.gettext(200,str2);
+                editBox1.gettext(128, sta1);
+                editBox2.gettext(128,sta2);
                 if(is_run()){
                     editBox1.visible(false);
                     editBox2.visible(false);
+                    editBox1.destroy();
+                    editBox2.destroy();
                     cleardevice();
                 }
                 break;
@@ -182,12 +183,9 @@ void GUI() {
             if(x==ESC){
                 break;
             }
-            if(x==CR){
-
-            }
         }
     }
-    Go(nets,str1,str2,Least_change);
+
 }
 
 #endif //DSCD_PAINT_H
