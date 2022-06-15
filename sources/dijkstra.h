@@ -120,7 +120,7 @@ int dijkstra(int sta1_id,int sta2_id,Nets nets){
         printf("%s(%s)->", nets.stations[x].name, nets.lines[pass[x]].name);
         x = path[x];
     }
-    printf("%s distance:%d", nets.stations[sta1_id].name, distance[sta2_id]);
+    printf("\n%s distance:%d", nets.stations[sta1_id].name, distance[sta2_id]);
     fflush(stdout);
     return test(pois);
 }
